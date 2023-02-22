@@ -1,4 +1,4 @@
-package org.wangyang.multidatasource.entity;
+package org.wangyang.multidatasource.mysql.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
