@@ -7,8 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123456
   postgres:
-    image: postgres:12-alpine
-    restart: always
+    build: ./postgres
     environment:
       POSTGRES_PASSWORD: 123456
     ports:
