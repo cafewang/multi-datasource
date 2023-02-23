@@ -1,10 +1,17 @@
 spring:
   datasource:
     mysql:
-      url: jdbc:mysql://10.211.55.4:3308/test
-      username: root
-      password: 123456
-      driver-class-name: com.mysql.cj.jdbc.Driver
+      master:
+        url: jdbc:mysql://10.211.55.4:3308/master
+        username: root
+        password: 123456
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      slave:
+        url: jdbc:mysql://10.211.55.4:3308/slave
+        username: root
+        password: 123456
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      route-to-slave: true
     postgres:
       url: jdbc:postgresql://10.211.55.4:5432/?currentSchema=test
       username: postgres
@@ -27,3 +34,10 @@ spring:
       properties:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQL10Dialect
+
+log4j:
+  logger:
+    org:
+      springframework:
+        transaction:
+          interceptor: trace

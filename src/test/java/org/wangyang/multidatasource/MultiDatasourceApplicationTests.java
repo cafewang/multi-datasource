@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.wangyang.multidatasource.enums.HairColor;
 import org.wangyang.multidatasource.mysql.entity.Cat;
-import org.wangyang.multidatasource.mysql.repo.MysqlCatRepo;
 import org.wangyang.multidatasource.postgres.repo.PostgresCatRepo;
+import org.wangyang.multidatasource.services.MysqlCatService;
 
 import javax.annotation.Resource;
 
@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 @ActiveProfiles("test")
 class MultiDatasourceApplicationTests {
 	@Resource
-	private MysqlCatRepo mysqlCatRepo;
+	private MysqlCatService mysqlCatService;
 	@Resource
 	private PostgresCatRepo postgresCatRepo;
 
@@ -26,8 +26,8 @@ class MultiDatasourceApplicationTests {
 				.age(3)
 				.hairColor(HairColor.BLUE)
 				.build();
-		mysqlCatRepo.save(cat);
-		Assertions.assertThat(mysqlCatRepo.count()).isEqualTo(1L);
+		mysqlCatService.saveIntoSlave(cat);
+		Assertions.assertThat(mysqlCatService.queryFromMaster(1L)).isNull();
 	}
 
 	@Test

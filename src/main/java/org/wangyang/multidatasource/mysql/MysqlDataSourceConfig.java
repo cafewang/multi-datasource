@@ -14,10 +14,12 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.wangyang.multidatasource.enums.RoutingDataSourceEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -28,14 +30,37 @@ import java.util.Map;
 )
 public class MysqlDataSourceConfig {
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.mysql")
-    public DataSourceProperties mysqlDataSourceProps() {
+    @ConfigurationProperties(prefix = "spring.datasource.mysql.master")
+    public DataSourceProperties masterDataSourceProps() {
         return new DataSourceProperties();
     }
 
     @Bean
-    public DataSource mysqlDataSource(@Qualifier("mysqlDataSourceProps") DataSourceProperties dataSourceProperties) {
+    @ConfigurationProperties(prefix = "spring.datasource.mysql.slave")
+    public DataSourceProperties slaveDataSourceProps() {
+        return new DataSourceProperties();
+    }
+
+    @Bean
+    public DataSource masterDataSource(@Qualifier("masterDataSourceProps") DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+    @Bean
+    public DataSource slaveDataSource(@Qualifier("slaveDataSourceProps") DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+    @Bean
+    public DataSource mysqlDataSource(@Qualifier("masterDataSource") DataSource masterDataSource,
+                                        @Qualifier("slaveDataSource") DataSource slaveDataSource) {
+        Map<Object, Object> dataSourceMap = new HashMap<>();
+        dataSourceMap.put(RoutingDataSourceEnum.MASTER, masterDataSource);
+        dataSourceMap.put(RoutingDataSourceEnum.SLAVE, slaveDataSource);
+        RoutingDataSource routingDataSource = new RoutingDataSource();
+        routingDataSource.setDefaultTargetDataSource(masterDataSource);
+        routingDataSource.setTargetDataSources(dataSourceMap);
+        return routingDataSource;
     }
 
     @Bean
