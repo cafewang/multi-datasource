@@ -21,6 +21,7 @@ class MultiDatasourceApplicationTests {
 
 	@Test
 	void should_save_into_mysql() {
+		mysqlCatService.createTable();
 		Cat cat = Cat.builder()
 				.name("Tom")
 				.age(3)
@@ -28,6 +29,7 @@ class MultiDatasourceApplicationTests {
 				.build();
 		mysqlCatService.saveIntoSlave(cat);
 		Assertions.assertThat(mysqlCatService.queryFromMaster(1L)).isNull();
+		mysqlCatService.dropTable();
 	}
 
 	@Test
